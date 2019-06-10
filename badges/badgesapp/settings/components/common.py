@@ -1,6 +1,4 @@
-from server.settings.components import BASE_DIR, config
-
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+from badgesapp.settings.components import BASE_DIR
 
 # Application definition
 
@@ -42,27 +40,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'badgesapp.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('POSTGRES_DB'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('DJANGO_DATABASE_HOST'),
-        'PORT': config('DJANGO_DATABASE_PORT', cast=int),
-        'CONN_MAX_AGE': config('CONN_MAX_AGE', cast=int, default=60),
-        'OPTIONS': {
-            'connect_timeout': 10,
-        },
-    },
-}
-
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
