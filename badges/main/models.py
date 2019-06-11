@@ -13,7 +13,7 @@ class BadgeTemplate(TitleSlugDescriptionModel, TimeStampedModel):
 
 
 class BadgeInstance(TimeStampedModel):
-    template = models.ForeignKey(BadgeTemplate)
+    template = models.ForeignKey(BadgeTemplate, on_delete=models.CASCADE)
     data = JSONField(blank=True)
     key = ShortUUIDField()
     external = models.TextField(unique=True)
