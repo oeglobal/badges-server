@@ -13,6 +13,8 @@ black = "==19.3b0"
 django-extensions = "*"
 shortuuid = "*"
 toml = "*"
+sarge = "*"
+python-magic = "*"
 
 [requires]
 python_version = "3.7"

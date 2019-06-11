@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "639a303fb462cf72e7322469f0469cec928686ef0929da72455e52dce94fd0bc"
+            "sha256": "3de664cf6f2b48c715a8082ce30cd0f097fdc99c628cf8694c3cfd458353f8e9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -86,12 +86,27 @@
             "index": "pypi",
             "version": "==2.8.2"
         },
+        "python-magic": {
+            "hashes": [
+                "sha256:f2674dcfad52ae6c49d4803fa027809540b130db1dec928cfbb9240316831375",
+                "sha256:f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5"
+            ],
+            "index": "pypi",
+            "version": "==0.4.15"
+        },
         "pytz": {
             "hashes": [
                 "sha256:303879e36b721603cc54604edcac9d20401bdbe31e1e4fdee5b9f98d5d31dfda",
                 "sha256:d747dd3d23d77ef44c6a3526e274af6efeb0a6f1afd5a69ba4d5be4098c8e141"
             ],
             "version": "==2019.1"
+        },
+        "sarge": {
+            "hashes": [
+                "sha256:da8cc90883f8e5ab4af0d746438f608662f5f2a35da2e858517927edefa134b0"
+            ],
+            "index": "pypi",
+            "version": "==0.1.5.post0"
         },
         "shortuuid": {
             "hashes": [
