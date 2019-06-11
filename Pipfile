@@ -12,6 +12,7 @@ psycopg2 = "*"
 black = "==19.3b0"
 django-extensions = "*"
 shortuuid = "*"
+toml = "*"
 
 [requires]
 python_version = "3.7"

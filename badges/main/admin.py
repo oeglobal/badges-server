@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import BadgeTemplate, BadgeInstance
+
+
+@admin.register(BadgeInstance)
+class BadgeInstanceAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(BadgeTemplate)
+class BadgeTemplateAdmin(admin.ModelAdmin):
+    pass

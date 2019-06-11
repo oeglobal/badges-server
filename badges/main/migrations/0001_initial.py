@@ -10,40 +10,98 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='BadgeTemplate',
+            name="BadgeTemplate",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('title', models.CharField(max_length=255, verbose_name='title')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='description')),
-                ('slug', django_extensions.db.fields.AutoSlugField(blank=True, editable=False, populate_from='title', verbose_name='slug')),
-                ('repository', models.TextField(help_text='Git Repository in https:// .. format')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
+                ("title", models.CharField(max_length=255, verbose_name="title")),
+                (
+                    "description",
+                    models.TextField(blank=True, null=True, verbose_name="description"),
+                ),
+                (
+                    "slug",
+                    django_extensions.db.fields.AutoSlugField(
+                        blank=True,
+                        editable=False,
+                        populate_from="title",
+                        verbose_name="slug",
+                    ),
+                ),
+                (
+                    "repository",
+                    models.TextField(help_text="Git Repository in https:// .. format"),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='BadgeInstance',
+            name="BadgeInstance",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('data', django.contrib.postgres.fields.jsonb.JSONField(blank=True)),
-                ('key', django_extensions.db.fields.ShortUUIDField(blank=True, editable=False)),
-                ('external', models.TextField(unique=True)),
-                ('template', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.BadgeTemplate')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
+                ),
+                ("data", django.contrib.postgres.fields.jsonb.JSONField(blank=True)),
+                (
+                    "key",
+                    django_extensions.db.fields.ShortUUIDField(
+                        blank=True, editable=False
+                    ),
+                ),
+                ("external", models.TextField(unique=True)),
+                (
+                    "template",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="main.BadgeTemplate",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-modified', '-created'),
-                'get_latest_by': 'modified',
-                'abstract': False,
+                "ordering": ("-modified", "-created"),
+                "get_latest_by": "modified",
+                "abstract": False,
             },
         ),
     ]
