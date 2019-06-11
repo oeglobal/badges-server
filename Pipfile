@@ -9,6 +9,7 @@ verify_ssl = true
 django = "==2.2.2"
 django-split-settings = "*"
 psycopg2 = "*"
+black = "==19.3b0"
 
 [requires]
 python_version = "3.7"
