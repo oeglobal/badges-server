@@ -55,7 +55,7 @@ class AbstractRenderView(View):
 
     def get_render(self):
         image, mime = self.render_helper.get_rendered_file(
-            template_filename="single-badge.html", materialize=False
+            template_filename=self.filename, materialize=False
         )
         return HttpResponse(image, content_type=mime)
 

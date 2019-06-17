@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.urls import reverse
+import tempfile
+import os
 
 import sarge
 import toml
@@ -49,20 +51,47 @@ class BadgeRenderHelper:
                     "filename": template_filename,
                 },
             )
-        cmd = (
-            "capture-website {url} --width={width} --height={height} "
-            "--type={type} --element={element} --no-default-background".format(
-                width=render_config.get("screen_width", 1000),
-                height=render_config.get("screen_height", 1000),
-                type=render_config.get("format", "png"),
-                element=sarge.shell_quote(render_config.get("element", ".screenshot")),
-                url="{}{}".format(settings.RENDER_PREFIX_URL, url),
-            )
-        )
-        print(cmd)
-        p = sarge.run(cmd, stdout=sarge.Capture())
 
-        image = p.stdout.bytes
+        file_format = render_config.get("format", "png")
+        if file_format == "pdf":
+            f = tempfile.NamedTemporaryFile(delete=False)
+            tmppdf = f.name
+            f.close()
+
+            cmd = (
+                "node {chrome_pdf_bin} "
+                "--landscape --include-background --url {url} --pdf {tmppdf}".format(
+                    chrome_pdf_bin=settings.CHROME_PDF_BIN,
+                    tmppdf=tmppdf,
+                    url="{}{}".format(settings.RENDER_PREFIX_URL, url),
+                )
+            )
+            print(cmd)
+            sarge.run(cmd, stdout=sarge.Capture())
+
+            f = open(tmppdf, "rb")
+            image = f.read()
+            f.close()
+            os.unlink(f.name)
+
+        else:
+            cmd = (
+                "capture-website {url} --width={width} --height={height} "
+                "--type={type} --element={element} --no-default-background".format(
+                    width=render_config.get("screen_width", 1000),
+                    height=render_config.get("screen_height", 1000),
+                    type=file_format,
+                    element=sarge.shell_quote(
+                        render_config.get("element", ".screenshot")
+                    ),
+                    url="{}{}".format(settings.RENDER_PREFIX_URL, url),
+                )
+            )
+            print(cmd)
+            p = sarge.run(cmd, stdout=sarge.Capture())
+
+            image = p.stdout.bytes
+
         mime = magic.from_buffer(image, mime=True)
         return image, mime
 

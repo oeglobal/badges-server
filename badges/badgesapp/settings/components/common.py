@@ -59,3 +59,4 @@ USE_L10N = False
 STATIC_URL = "/static/"
 
 RENDER_PREFIX_URL = ""
+CHROME_PDF_BIN = ""
