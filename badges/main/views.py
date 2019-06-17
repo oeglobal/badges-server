@@ -6,26 +6,29 @@ from django.template import Template, Context
 import toml
 from pathlib import PurePath
 import sarge
-import magic
-
-from .models import BadgeTemplate
 
 
-class PreviewIndexView(View):
+from .models import BadgeTemplate, BadgeInstance
+from .render_utils import BadgeRenderHelper
+
+
+class AbstractRenderView(View):
+    data = None
+    render_helper = None
+
     def get_context_data(self, *args, **kwargs):
         context = {
             "TEMPLATE_STATIC": "/templates/{}/".format(self.badge_template.slug),
             "TEMPLATE_SLUG": self.badge_template.slug,
+            "data": self.data,
         }
-
-        sample_data = self.config["sample-data"]
-        context["data"] = sample_data
+        print(context["data"])
 
         return context
 
     @property
-    def config(self):
-        return toml.load(PurePath(self.badge_template.repository, "config.toml"))
+    def badge_template(self):
+        return BadgeTemplate.objects.get(slug=self.kwargs["slug"])
 
     @property
     def filename(self):
@@ -33,35 +36,6 @@ class PreviewIndexView(View):
             return self.kwargs["filename"]
 
         return "index.html"
-
-    @property
-    def badge_template(self):
-        return BadgeTemplate.objects.get(slug=self.kwargs["slug"])
-
-    @property
-    def render_config(self):
-        for template_file in self.config["files"]:
-            if self.filename == template_file["filename"]:
-                return template_file
-
-    def get_render(self):
-        cmd = (
-            "capture-website {url} --width={width} --height={height} "
-            "--type={type} --element={element} --no-default-background".format(
-                width=self.render_config.get("screen_width", 1000),
-                height=self.render_config.get("screen_height", 1000),
-                type=self.render_config.get("format", "png"),
-                element=sarge.shell_quote(
-                    self.render_config.get("element", ".screenshot")
-                ),
-                url="http://localhost:8000/preview/oeawards/single-badge.html",
-            )
-        )
-        p = sarge.run(cmd, stdout=sarge.Capture())
-
-        image = p.stdout.bytes
-        mime = magic.from_buffer(image, mime=True)
-        return HttpResponse(image, content_type=mime)
 
     def get(self, request, *args, **kwargs):
         if request.GET.get("render", False):
@@ -74,3 +48,35 @@ class PreviewIndexView(View):
             c = Context(self.get_context_data())
 
             return HttpResponse(t.render(c), request)
+
+    @property
+    def config(self):
+        return toml.load(PurePath(self.badge_template.repository, "config.toml"))
+
+    def get_render(self):
+        image, mime = self.render_helper.get_rendered_file(
+            template_filename="single-badge.html", materialize=False
+        )
+        return HttpResponse(image, content_type=mime)
+
+
+class PreviewIndexView(AbstractRenderView):
+    def dispatch(self, request, *args, **kwargs):
+        self.data = self.config["sample-data"]
+        self.render_helper = BadgeRenderHelper(
+            badge_template=self.badge_template, data=self.data
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class InstanceIndexView(AbstractRenderView):
+    @property
+    def badge_instance(self):
+        return BadgeInstance.objects.get(pk=self.kwargs["pk"])
+
+    def dispatch(self, request, *args, **kwargs):
+        self.data = self.badge_instance.data
+        self.render_helper = BadgeRenderHelper(badge_instance=self.badge_instance)
+
+        return super().dispatch(request, *args, **kwargs)

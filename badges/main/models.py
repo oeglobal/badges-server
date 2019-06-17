@@ -26,3 +26,8 @@ class BadgeInstance(TimeStampedModel):
 
     def __str__(self):
         return self.external
+
+    def save(self, *args, **kwargs):
+        # TODO: check for _loaded_values
+        # https://docs.djangoproject.com/en/2.2/ref/models/instances/#customizing-model-loading
+        super().save(*args, **kwargs)

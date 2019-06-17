@@ -5,7 +5,7 @@ from .models import BadgeTemplate, BadgeInstance
 
 @admin.register(BadgeInstance)
 class BadgeInstanceAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ("key",)
 
 
 @admin.register(BadgeTemplate)

@@ -57,3 +57,5 @@ USE_L10N = False
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = "/static/"
+
+RENDER_PREFIX_URL = ""
