@@ -1,12 +1,18 @@
 from django.conf import settings
 from django.urls import reverse
+from django.core.files.base import ContentFile
+from django.core.files import File
+
 import tempfile
 import os
+import zipfile
 
 import sarge
 import toml
 import magic
 from pathlib import PurePath
+
+from .models import Media
 
 
 class BadgeRenderHelper:
@@ -66,7 +72,6 @@ class BadgeRenderHelper:
                     url="{}{}".format(settings.RENDER_PREFIX_URL, url),
                 )
             )
-            print(cmd)
             sarge.run(cmd, stdout=sarge.Capture())
 
             f = open(tmppdf, "rb")
@@ -87,7 +92,6 @@ class BadgeRenderHelper:
                     url="{}{}".format(settings.RENDER_PREFIX_URL, url),
                 )
             )
-            print(cmd)
             p = sarge.run(cmd, stdout=sarge.Capture())
 
             image = p.stdout.bytes
@@ -95,8 +99,48 @@ class BadgeRenderHelper:
         mime = magic.from_buffer(image, mime=True)
         return image, mime
 
-    def get_rendered_file(self, template_filename, materialize=False):
+    def get_rendered_file(self, *, template_filename=None, materialize=False):
         if materialize:
-            raise NotImplementedError
+            render_config = self.render_config(template_filename)
+            file_format = render_config.get("format", "png")
+
+            file_stem = PurePath(template_filename).stem
+            media_filename = "{}.{}".format(file_stem, file_format)
+
+            image, mime = self._render(template_filename=template_filename)
+            media = Media(instance=self.badge_instance, kind="media")
+
+            media.file.save(media_filename, content=ContentFile(image))
+            media.save()
+            return media
+
         else:
             return self._render(template_filename=template_filename)
+
+    def build_archive(self):
+        Media.objects.filter(instance=self.badge_instance).delete()
+
+        rendered_files = []
+        for tf in self.config["files"]:
+            media = self.get_rendered_file(
+                template_filename=tf["filename"], materialize=True
+            )
+            rendered_files.append(media)
+
+        f = tempfile.NamedTemporaryFile(delete=False)
+        zipf_name = f.name
+        f.close()
+
+        zipf = zipfile.ZipFile(zipf_name, "w", zipfile.ZIP_DEFLATED)
+        for tf in rendered_files:
+            arcname = PurePath(tf.file.path).name
+            zipf.write(tf.file.path, arcname="archive/{}".format(arcname))
+        zipf.close()
+
+        archive = Media(instance=self.badge_instance, kind="archive")
+        archive.file.save(
+            name="archive-{}.zip".format(self.badge_instance.pk),
+            content=File(open(zipf_name, "rb")),
+            save=True,
+        )
+        archive.save()

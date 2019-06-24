@@ -31,3 +31,18 @@ class BadgeInstance(TimeStampedModel):
         # TODO: check for _loaded_values
         # https://docs.djangoproject.com/en/2.2/ref/models/instances/#customizing-model-loading
         super().save(*args, **kwargs)
+
+    def build_archive(self):
+        pass
+
+
+MEDIA_TYPE_CHOICES = (("archive", "Archive"), ("media", "Individual file"))
+
+
+class Media(TimeStampedModel):
+    instance = models.ForeignKey(BadgeInstance, on_delete=models.CASCADE)
+    file = models.FileField(upload_to="media/rendered")
+    kind = models.CharField(choices=MEDIA_TYPE_CHOICES, max_length=64)
+
+    def __str__(self):
+        return self.file.name
