@@ -32,6 +32,7 @@ class Command(BaseCommand):
         for row in dataset:
             if row[0]:
                 data = dict(zip(headers, row))
+                print(data)
 
                 obj, created = BadgeInstance.objects.update_or_create(
                     template=badge_template,

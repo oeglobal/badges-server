@@ -66,7 +66,8 @@ class BadgeRenderHelper:
 
             cmd = (
                 "node {chrome_pdf_bin} "
-                "--landscape --include-background --url {url} --pdf {tmppdf}".format(
+                "--paper-width 8.27 --paper-height 11.69"
+                "--no-margins --landscape --include-background --url {url} --pdf {tmppdf}".format(
                     chrome_pdf_bin=settings.CHROME_PDF_BIN,
                     tmppdf=tmppdf,
                     url="{}{}".format(settings.RENDER_PREFIX_URL, url),
@@ -108,7 +109,11 @@ class BadgeRenderHelper:
             media_filename = "{}.{}".format(file_stem, file_format)
 
             image, mime = self._render(template_filename=template_filename)
-            media = Media(instance=self.badge_instance, kind="media")
+            media = Media(
+                instance=self.badge_instance,
+                kind="media",
+                original_filename=media_filename.replace("single-", ""),
+            )
 
             media.file.save(media_filename, content=ContentFile(image))
             media.save()
@@ -131,15 +136,17 @@ class BadgeRenderHelper:
         zipf_name = f.name
         f.close()
 
+        archive_name = self.badge_instance.external
+
         zipf = zipfile.ZipFile(zipf_name, "w", zipfile.ZIP_DEFLATED)
         for tf in rendered_files:
-            arcname = PurePath(tf.file.path).name
-            zipf.write(tf.file.path, arcname="archive/{}".format(arcname))
+            arcname = tf.original_filename
+            zipf.write(tf.file.path, arcname="{}/{}".format(archive_name, arcname))
         zipf.close()
 
         archive = Media(instance=self.badge_instance, kind="archive")
         archive.file.save(
-            name="archive-{}.zip".format(self.badge_instance.pk),
+            name=self.badge_instance.external + ".zip",
             content=File(open(zipf_name, "rb")),
             save=True,
         )

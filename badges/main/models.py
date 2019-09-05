@@ -42,6 +42,7 @@ MEDIA_TYPE_CHOICES = (("archive", "Archive"), ("media", "Individual file"))
 class Media(TimeStampedModel):
     instance = models.ForeignKey(BadgeInstance, on_delete=models.CASCADE)
     file = models.FileField(upload_to="media/rendered")
+    original_filename = models.TextField(default="")
     kind = models.CharField(choices=MEDIA_TYPE_CHOICES, max_length=64)
 
     def __str__(self):
