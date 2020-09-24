@@ -1,3 +1,4 @@
+import sys
 from django.urls import path
 from django.urls import re_path
 
@@ -28,11 +29,12 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    for local_template in BadgeTemplate.objects.filter(repository__startswith="/"):
-        urlpatterns += [
-            re_path(
-                r"^templates/{slug}/(?P<path>.*)$".format(slug=local_template.slug),
-                serve,
-                {"document_root": local_template.repository},
-            )
-        ]
+    if not ('makemigrations' in sys.argv or 'migrate' in sys.argv):
+        for local_template in BadgeTemplate.objects.filter(repository__startswith="/"):
+            urlpatterns += [
+                re_path(
+                    r"^templates/{slug}/(?P<path>.*)$".format(slug=local_template.slug),
+                    serve,
+                    {"document_root": local_template.repository},
+                )
+            ]
