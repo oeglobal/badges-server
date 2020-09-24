@@ -82,7 +82,7 @@ class BadgeRenderHelper:
 
         else:
             cmd = (
-                "capture-website {url} --width={width} --height={height} "
+                "{capture_bin} {url} --width={width} --height={height} "
                 "--type={type} --element={element} --no-default-background".format(
                     width=render_config.get("screen_width", 1000),
                     height=render_config.get("screen_height", 1000),
@@ -91,6 +91,7 @@ class BadgeRenderHelper:
                         render_config.get("element", ".screenshot")
                     ),
                     url="{}{}".format(settings.RENDER_PREFIX_URL, url),
+                    capture_bin=settings.CAPTURE_BIN,
                 )
             )
             p = sarge.run(cmd, stdout=sarge.Capture())

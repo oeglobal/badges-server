@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "capture-website-cli": "0.3.0",
-    "chrome-headless-render-pdf": "^1.8.2"
+    "capture-website-cli": "^1.0.0",
+    "chrome-headless-render-pdf": "^1.8.5",
+    "sass": "^1.26.11"
   }
 }
